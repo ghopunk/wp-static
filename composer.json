@@ -1,0 +1,27 @@
+{
+    "name": "ghopunk/wp-static",
+    "description": "WP function with static class",
+    "keywords": [
+        "ghopunk",
+        "php",
+		"wordpress"
+    ],
+    "homepage": "https://github.com/ghopunk/wp-static",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ghopunk",
+            "email": "support@bloggerpemalas.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "ghopunk\\WpStatic\\": "src"
+        }
+    },
+    "prefer-stable": true
+}
