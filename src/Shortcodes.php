@@ -1,5 +1,5 @@
 <?php
-namespace ghopunk\wp;
+namespace ghopunk\WpStatic;
 
 //wp-includes/shortcodes.php
 
