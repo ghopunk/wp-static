@@ -89,7 +89,7 @@ class Shortcodes {
 
 		return $content;
 	}
-
+	
 	static function get_shortcode_regex( $tagnames = null ) {
 
 		if ( empty( $tagnames ) ) {
@@ -276,5 +276,40 @@ class Shortcodes {
 
 		return $m[1] . $m[6];
 	}
+	
+	//add from me. Only execute spesific shortcode tags
+	//tags array. ex: [ 'tags_1', 'tags_2' ]
+	static function do_shortcode_by_tags( $content, array $tags = array(), $ignore_html = false ) {
+		
+		if ( false === strpos( $content, '[' ) ) {
+			return $content;
+		}
+		
+		if ( empty( static::$shortcode_tags ) || ! is_array( static::$shortcode_tags ) ) {
+			return $content;
+		}
+		
+		if( empty($tags) ) {
+			return static::do_shortcode( $content, $ignore_html );
+		}
+		
+		// Find all registered tag names in $content.
+		preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
+		$tagnames = array_intersect( $tags, $matches[1] );
 
+		if ( empty( $tagnames ) ) {
+			return $content;
+		}
+		
+		//tidak dipakai, rawan error
+		//$content = static::do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
+
+		$pattern = static::get_shortcode_regex( $tagnames );
+		$content = preg_replace_callback( "/$pattern/", '\\' . __CLASS__ . '::do_shortcode_tag', $content );
+
+		// Always restore square braces so we don't break things like <!--[if IE ]>.
+		$content = static::unescape_invalid_shortcodes( $content );
+
+		return $content;
+	}
 }
