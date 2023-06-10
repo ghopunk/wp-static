@@ -277,8 +277,11 @@ class Shortcodes {
 		return $m[1] . $m[6];
 	}
 	
-	//add from me. Only execute spesific shortcode tags
+	/*ADD FUNCTION*/
+	
+	//Execute spesific shortcode tags
 	//tags array. ex: [ 'tags_1', 'tags_2' ]
+	//Ex Shortcodes::do_shortcode_by_tags( '[shortcode] content', ['shortcode'] );
 	static function do_shortcode_by_tags( $content, array $tags = array(), $ignore_html = false ) {
 		
 		if ( false === strpos( $content, '[' ) ) {
@@ -312,4 +315,26 @@ class Shortcodes {
 
 		return $content;
 	}
+	
+	
+	//build format shortcode => [tag]
+	//Ex Shortcodes::shortcode_format( 'shortcode', ['id'=>1] );
+	static function shortcode_format( $tag, $atts = array(), $content = false ) {
+		if( empty($tag) || !is_string($tag) ) {
+			return false;
+		}
+		$shortcode = "[{$tag}";
+		if( !empty($atts) && is_array($atts) ) {
+			foreach ( $atts as $key => $value ) {
+				$shortcode .= " {$key}='" . htmlspecialchars($value) . "'";
+			}
+		}
+		$shortcode .= "]";
+		if ( !empty($content) ) {
+			$shortcode .= "{$content}";
+			$shortcode .= "[/{$tag}]";
+		}
+		return $shortcode;
+	}
+	
 }
