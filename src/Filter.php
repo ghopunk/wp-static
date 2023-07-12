@@ -247,7 +247,7 @@ class Filter {
 	}
 
 	static function has_action( $hook_name, $callback = false ) {
-		return has_filter( $hook_name, $callback );
+		return static::has_filter( $hook_name, $callback );
 	}
 
 	static function remove_action( $hook_name, $callback, $priority = 10 ) {
