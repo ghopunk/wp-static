@@ -1,4 +1,5 @@
 <?php
+
 namespace ghopunk\WpStatic;
 
 use ghopunk\WpStatic\WpHook;
