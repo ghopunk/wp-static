@@ -331,6 +331,7 @@ class Shortcodes {
 			}
 		}
 		$shortcode .= "]";
+		$content = trim($content);
 		if ( !empty($content) ) {
 			$shortcode .= "{$content}";
 			$shortcode .= "[/{$tag}]";
