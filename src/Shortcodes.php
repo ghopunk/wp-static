@@ -18,21 +18,21 @@ class Shortcodes {
 			return;
 		}
 
-		static::$shortcode_tags[ $tag ] = $callback;
+		self::$shortcode_tags[ $tag ] = $callback;
 	}
 
 	static function remove_shortcode( $tag ) {
 
-		unset( static::$shortcode_tags[ $tag ] );
+		unset( self::$shortcode_tags[ $tag ] );
 	}
 
 	static function remove_all_shortcodes() {
 
-		static::$shortcode_tags = array();
+		self::$shortcode_tags = array();
 	}
 
 	static function shortcode_exists( $tag ) {
-		return array_key_exists( $tag, static::$shortcode_tags );
+		return array_key_exists( $tag, self::$shortcode_tags );
 	}
 
 	static function has_shortcode( $content, $tag ) {
@@ -40,8 +40,8 @@ class Shortcodes {
 			return false;
 		}
 
-		if ( static::shortcode_exists( $tag ) ) {
-			preg_match_all( '/' . static::get_shortcode_regex() . '/', $content, $matches, PREG_SET_ORDER );
+		if ( self::shortcode_exists( $tag ) ) {
+			preg_match_all( '/' . self::get_shortcode_regex() . '/', $content, $matches, PREG_SET_ORDER );
 			if ( empty( $matches ) ) {
 				return false;
 			}
@@ -49,7 +49,7 @@ class Shortcodes {
 			foreach ( $matches as $shortcode ) {
 				if ( $tag === $shortcode[2] ) {
 					return true;
-				} elseif ( ! empty( $shortcode[5] ) && static::has_shortcode( $shortcode[5], $tag ) ) {
+				} elseif ( ! empty( $shortcode[5] ) && self::has_shortcode( $shortcode[5], $tag ) ) {
 					return true;
 				}
 			}
@@ -58,7 +58,7 @@ class Shortcodes {
 	}
 
 	static function apply_shortcodes( $content, $ignore_html = false ) {
-		return static::do_shortcode( $content, $ignore_html );
+		return self::do_shortcode( $content, $ignore_html );
 	}
 
 	static function do_shortcode( $content, $ignore_html = false ) {
@@ -67,26 +67,26 @@ class Shortcodes {
 			return $content;
 		}
 		
-		if ( empty( static::$shortcode_tags ) || ! is_array( static::$shortcode_tags ) ) {
+		if ( empty( self::$shortcode_tags ) || ! is_array( self::$shortcode_tags ) ) {
 			return $content;
 		}
 
 		// Find all registered tag names in $content.
 		preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
-		$tagnames = array_intersect( array_keys( static::$shortcode_tags ), $matches[1] );
+		$tagnames = array_intersect( array_keys( self::$shortcode_tags ), $matches[1] );
 
 		if ( empty( $tagnames ) ) {
 			return $content;
 		}
 		
 		//tidak dipakai, rawan error
-		//$content = static::do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
+		//$content = self::do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
 
-		$pattern = static::get_shortcode_regex( $tagnames );
+		$pattern = self::get_shortcode_regex( $tagnames );
 		$content = preg_replace_callback( "/$pattern/", '\\' . __CLASS__ . '::do_shortcode_tag', $content );
 
 		// Always restore square braces so we don't break things like <!--[if IE ]>.
-		$content = static::unescape_invalid_shortcodes( $content );
+		$content = self::unescape_invalid_shortcodes( $content );
 
 		return $content;
 	}
@@ -94,7 +94,7 @@ class Shortcodes {
 	static function get_shortcode_regex( $tagnames = null ) {
 
 		if ( empty( $tagnames ) ) {
-			$tagnames = array_keys( static::$shortcode_tags );
+			$tagnames = array_keys( self::$shortcode_tags );
 		}
 		$tagregexp = implode( '|', array_map( 'preg_quote', $tagnames ) );
 
@@ -141,25 +141,25 @@ class Shortcodes {
 		}
 
 		$tag  = $m[2];
-		$attr = static::shortcode_parse_atts( $m[3] );
+		$attr = self::shortcode_parse_atts( $m[3] );
 
-		if ( ! is_callable( static::$shortcode_tags[ $tag ] ) ) {
+		if ( ! is_callable( self::$shortcode_tags[ $tag ] ) ) {
 			return $m[0];
 		}
 		
 		//filter tidak dipakai
-		//$return = static::apply_filters( 'pre_do_shortcode_tag', false, $tag, $attr, $m );
+		//$return = self::apply_filters( 'pre_do_shortcode_tag', false, $tag, $attr, $m );
 		//if ( false !== $return ) {
 		//	return $return;
 		//}
 
 		$content = isset( $m[5] ) ? $m[5] : null;
 
-		$output = $m[1] . call_user_func( static::$shortcode_tags[ $tag ], $attr, $content, $tag ) . $m[6];
+		$output = $m[1] . call_user_func( self::$shortcode_tags[ $tag ], $attr, $content, $tag ) . $m[6];
 		
 		return $output;
 		//filter tidak dipakai
-		//return static::apply_filters( 'do_shortcode_tag', $output, $tag, $attr, $m );
+		//return self::apply_filters( 'do_shortcode_tag', $output, $tag, $attr, $m );
 	}
 
 	static function unescape_invalid_shortcodes( $content ) {
@@ -180,7 +180,7 @@ class Shortcodes {
 
 	static function shortcode_parse_atts( $text ) {
 		$atts    = array();
-		$pattern = static::get_shortcode_atts_regex();
+		$pattern = self::get_shortcode_atts_regex();
 		$text    = preg_replace( "/[\x{00a0}\x{200b}]+/u", ' ', $text );
 		if ( preg_match_all( $pattern, $text, $match, PREG_SET_ORDER ) ) {
 			foreach ( $match as $m ) {
@@ -227,7 +227,7 @@ class Shortcodes {
 
 		if ( $shortcode ) {
 			//filter tidak dipakai
-			//$out = static::apply_filters( "shortcode_atts_{$shortcode}", $out, $pairs, $atts, $shortcode );
+			//$out = self::apply_filters( "shortcode_atts_{$shortcode}", $out, $pairs, $atts, $shortcode );
 		}
 
 		return $out;
@@ -239,17 +239,17 @@ class Shortcodes {
 			return $content;
 		}
 
-		if ( empty( static::$shortcode_tags ) || ! is_array( static::$shortcode_tags ) ) {
+		if ( empty( self::$shortcode_tags ) || ! is_array( self::$shortcode_tags ) ) {
 			return $content;
 		}
 
 		// Find all registered tag names in $content.
 		preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
 
-		$tags_to_remove = array_keys( static::$shortcode_tags );
+		$tags_to_remove = array_keys( self::$shortcode_tags );
 		
 		//filter tidak dipakai
-		//$tags_to_remove = static::apply_filters( 'strip_shortcodes_tagnames', $tags_to_remove, $content );
+		//$tags_to_remove = self::apply_filters( 'strip_shortcodes_tagnames', $tags_to_remove, $content );
 
 		$tagnames = array_intersect( $tags_to_remove, $matches[1] );
 
@@ -258,13 +258,13 @@ class Shortcodes {
 		}
 		
 		//tidak dipakai, rawan error
-		//$content = static::do_shortcodes_in_html_tags( $content, true, $tagnames );
+		//$content = self::do_shortcodes_in_html_tags( $content, true, $tagnames );
 
-		$pattern = static::get_shortcode_regex( $tagnames );
+		$pattern = self::get_shortcode_regex( $tagnames );
 		$content = preg_replace_callback( "/$pattern/", '\\' . __CLASS__ . '::strip_shortcode_tag', $content );
 
 		// Always restore square braces so we don't break things like <!--[if IE ]>.
-		$content = static::unescape_invalid_shortcodes( $content );
+		$content = self::unescape_invalid_shortcodes( $content );
 
 		return $content;
 	}
@@ -289,12 +289,12 @@ class Shortcodes {
 			return $content;
 		}
 		
-		if ( empty( static::$shortcode_tags ) || ! is_array( static::$shortcode_tags ) ) {
+		if ( empty( self::$shortcode_tags ) || ! is_array( self::$shortcode_tags ) ) {
 			return $content;
 		}
 		
 		if( empty($tags) ) {
-			return static::do_shortcode( $content, $ignore_html );
+			return self::do_shortcode( $content, $ignore_html );
 		}
 		
 		// Find all registered tag names in $content.
@@ -306,13 +306,13 @@ class Shortcodes {
 		}
 		
 		//tidak dipakai, rawan error
-		//$content = static::do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
+		//$content = self::do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
 
-		$pattern = static::get_shortcode_regex( $tagnames );
+		$pattern = self::get_shortcode_regex( $tagnames );
 		$content = preg_replace_callback( "/$pattern/", '\\' . __CLASS__ . '::do_shortcode_tag', $content );
 
 		// Always restore square braces so we don't break things like <!--[if IE ]>.
-		$content = static::unescape_invalid_shortcodes( $content );
+		$content = self::unescape_invalid_shortcodes( $content );
 
 		return $content;
 	}
